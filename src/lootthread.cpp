@@ -412,6 +412,7 @@ int LOOTWorker::run()
 		}
 		outf.close();
 
+#if false // TODO: Disabling this as it seems it's never been useful and now it's throwing an exception
 		ptree report;
 
 		m_ProgressStep = "Parsing LOOT Messages";
@@ -443,7 +444,7 @@ int LOOTWorker::run()
 				}
 			}
 
-			std::set<PluginCleaningData> dirtyInfo = db->GetPluginMetadata(sortedPlugins[i]).GetDirtyInfo();
+			std::set<PluginCleaningData> dirtyInfo = db->GetPluginMetadata(sortedPlugins[i])->GetDirtyInfo(); //Error 5, Access violation
 			for (const auto &element : dirtyInfo) {
 				report.add("dirty", formatDirty(element));
 			}
@@ -452,6 +453,7 @@ int LOOTWorker::run()
 		std::ofstream buf;
 		buf.open(m_OutputPath.c_str());
 		write_json(buf, report, false);
+#endif
 	}
 	catch (const std::exception &e) {
 		errorOccured((boost::format("LOOT failed: %1%") % e.what()).str());

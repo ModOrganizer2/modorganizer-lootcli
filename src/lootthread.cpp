@@ -112,12 +112,12 @@ fs::path GetLOOTAppData() {
 
 fs::path LOOTWorker::masterlistPath() const
 {
-    return GetLOOTAppData() / m_GameSettings.FolderName() / "masterlist.yaml";
+    return GetLOOTAppData() / "games" / m_GameSettings.FolderName() / "masterlist.yaml";
 }
 
 fs::path LOOTWorker::userlistPath() const
 {
-    return GetLOOTAppData() / m_GameSettings.FolderName() / "userlist.yaml";
+    return GetLOOTAppData() / "games" / m_GameSettings.FolderName() / "userlist.yaml";
 }
 fs::path LOOTWorker::settingsPath() const
 {

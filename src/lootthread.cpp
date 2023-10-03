@@ -19,7 +19,7 @@ namespace lootcli
 {
 static const std::set<std::string> oldDefaultBranches({"master", "v0.7", "v0.8",
                                                        "v0.10", "v0.13", "v0.14",
-                                                       "v0.15", "v0.17"});
+                                                       "v0.15", "v0.17", "v0.18"});
 static const std::regex GITHUB_REPO_URL_REGEX =
     std::regex(R"(^https://github\.com/([^/]+)/([^/]+?)(?:\.git)?/?$)",
                std::regex::ECMAScript | std::regex::icase);
@@ -55,12 +55,13 @@ std::string ToLower(std::string text)
 void LOOTWorker::setGame(const std::string& gameName)
 {
   static std::map<std::string, loot::GameId> gameMap = {
-      {"morrowind", loot::GameId::tes3},   {"oblivion", loot::GameId::tes4},
-      {"fallout3", loot::GameId::fo3},     {"fallout4", loot::GameId::fo4},
-      {"fallout4vr", loot::GameId::fo4vr}, {"falloutnv", loot::GameId::fonv},
-      {"skyrim", loot::GameId::tes5},      {"skyrimse", loot::GameId::tes5se},
-      {"skyrimvr", loot::GameId::tes5vr},  {"nehrim", loot::GameId::nehrim},
-      {"enderal", loot::GameId::enderal},  {"enderalse", loot::GameId::enderalse}};
+      {"morrowind", loot::GameId::tes3},     {"oblivion", loot::GameId::tes4},
+      {"fallout3", loot::GameId::fo3},       {"fallout4", loot::GameId::fo4},
+      {"fallout4vr", loot::GameId::fo4vr},   {"falloutnv", loot::GameId::fonv},
+      {"skyrim", loot::GameId::tes5},        {"skyrimse", loot::GameId::tes5se},
+      {"skyrimvr", loot::GameId::tes5vr},    {"nehrim", loot::GameId::nehrim},
+      {"enderal", loot::GameId::enderal},    {"enderalse", loot::GameId::enderalse},
+      {"starfield", loot::GameId::starfield}};
 
   auto iter = gameMap.find(ToLower(gameName));
 

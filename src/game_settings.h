@@ -29,7 +29,8 @@ enum struct GameId : uint8_t
   fo3,
   fonv,
   fo4,
-  fo4vr
+  fo4vr,
+  starfield
 };
 
 GameType GetGameType(const GameId gameId);

@@ -8,7 +8,7 @@ VS_VERSION_INFO VERSIONINFO
 FILEVERSION     VER_FILEVERSION
 PRODUCTVERSION  VER_FILEVERSION
 FILEFLAGSMASK   VS_FFI_FILEFLAGSMASK
-FILEFLAGS       VS_FF_PRERELEASE
+FILEFLAGS       (0)
 FILEOS          VOS__WINDOWS32
 FILETYPE        VFT_APP
 FILESUBTYPE     (0)
@@ -22,7 +22,7 @@ VALUE "CompanyName", "Mod Organizer 2 Team\0"
 VALUE "FileDescription",  "LOOT Command line interface\0"
 VALUE "OriginalFilename", "lootcli.exe\0"
 VALUE "InternalName", "lootcli\0"
-VALUE "LegalCopyright", "Copyright 2011-2016 Sebastian Herbord\r\nCopyright 2016-2021 Mod Organizer 2 contributors\0"
+VALUE "LegalCopyright", "Copyright 2011-2016 Sebastian Herbord\r\nCopyright 2016-2023 Mod Organizer 2 contributors\0"
 VALUE "ProductName",      "lootcli\0"
 VALUE "ProductVersion", VER_FILEVERSION_STR
 END

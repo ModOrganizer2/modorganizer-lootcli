@@ -83,18 +83,18 @@ private:
   std::string createJsonReport(loot::GameInterface& game,
                                const std::vector<std::string>& sortedPlugins) const;
 
-  QJsonArray createPlugins(loot::GameInterface& game,
-                           const std::vector<std::string>& sortedPlugins) const;
+  json createPlugins(loot::GameInterface& game,
+                     const std::vector<std::string>& sortedPlugins) const;
 
-  QJsonValue createMessages(const std::vector<loot::Message>& list) const;
-  QJsonValue createDirty(const std::vector<loot::PluginCleaningData>& data) const;
-  QJsonValue createClean(const std::vector<loot::PluginCleaningData>& data) const;
+  json createMessages(const std::vector<loot::Message>& list) const;
+  json createDirty(const std::vector<loot::PluginCleaningData>& data) const;
+  json createClean(const std::vector<loot::PluginCleaningData>& data) const;
 
-  QJsonValue createIncompatibilities(loot::GameInterface& game,
-                                     const std::vector<loot::File>& data) const;
+  json createIncompatibilities(loot::GameInterface& game,
+                               const std::vector<loot::File>& data) const;
 
-  QJsonValue createMissingMasters(loot::GameInterface& game,
-                                  const std::string& pluginName) const;
+  json createMissingMasters(loot::GameInterface& game,
+                            const std::string& pluginName) const;
 };
 
 }  // namespace lootcli

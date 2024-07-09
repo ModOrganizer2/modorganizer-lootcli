@@ -41,31 +41,20 @@
 #include <utility>
 #include <vector>
 
-// qt
-#include <QDir>
-#include <QFileInfo>
-#include <QJsonArray>
-#include <QJsonDocument>
-#include <QJsonObject>
-
 // boost
 #include <boost/algorithm/string.hpp>
-// #include <boost/assign.hpp>
-// #include <boost/format.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/locale.hpp>
-// #include <boost/log/core.hpp>
-// #include <boost/log/expressions.hpp>
-// #include <boost/log/trivial.hpp>
-// #include <boost/log/utility/setup/console.hpp>
-// #include <boost/log/utility/setup/file.hpp>
 
 // loot
 #include <loot/api.h>
 #include <loot/enum/game_type.h>
 
 // third-party
+#include <nlohmann/json.hpp>
 #include <toml++/toml.h>
+
+using json = nlohmann::json;
 
 // windows
 #define WIN32_LEAN_AND_MEAN

@@ -824,79 +824,76 @@ int LOOTWorker::run()
   return 0;
 }
 
-void set(QJsonObject& o, const char* e, const QJsonValue& v)
-{
-  if (v.isObject() && v.toObject().isEmpty()) {
-    return;
-  }
-
-  if (v.isArray() && v.toArray().isEmpty()) {
-    return;
-  }
-
-  if (v.isString() && v.toString().isEmpty()) {
-    return;
-  }
-
-  o[e] = v;
-}
+// void set(QJsonObject& o, const char* e, const json& v)
+//{
+//   if (v.isObject() && v.toObject().isEmpty()) {
+//     return;
+//   }
+//
+//   if (v.isArray() && v.toArray().isEmpty()) {
+//     return;
+//   }
+//
+//   if (v.isString() && v.toString().isEmpty()) {
+//     return;
+//   }
+//
+//   o[e] = v;
+// }
 
 std::string
 LOOTWorker::createJsonReport(loot::GameInterface& game,
                              const std::vector<std::string>& sortedPlugins) const
 {
-  QJsonObject root;
+  auto root = json::object();
 
-  set(root, "messages", createMessages(game.GetDatabase().GetGeneralMessages(true)));
-  set(root, "plugins", createPlugins(game, sortedPlugins));
+  root["messages"] = createMessages(game.GetDatabase().GetGeneralMessages(true));
+  root["plugins"]  = createPlugins(game, sortedPlugins);
 
   const auto end = std::chrono::high_resolution_clock::now();
 
-  set(root, "stats",
-      QJsonObject{{"time", std::chrono::duration_cast<std::chrono::milliseconds>(
-                               end - m_startTime)
-                               .count()},
-                  {"lootcliVersion", LOOTCLI_VERSION_STRING},
-                  {"lootVersion", QString::fromStdString(loot::GetLiblootVersion())}});
+  root["stats"] = {
+      {"time", std::chrono::duration_cast<std::chrono::milliseconds>(end - m_startTime)
+                   .count()},
+      {"lootcliVersion", LOOTCLI_VERSION_STRING},
+      {"lootVersion", loot::GetLiblootVersion()}};
 
-  QJsonDocument doc(root);
-  return doc.toJson(QJsonDocument::Indented).toStdString();
+  return root.dump(4);
 }
 
 template <class Container>
-QJsonArray createStringArray(const Container& c)
+json createStringArray(const Container& c)
 {
-  QJsonArray array;
+  auto array = json::array();
 
   for (auto&& e : c) {
-    array.push_back(QString::fromStdString(e));
+    array.push_back(e);
   }
 
   return array;
 }
 
-QJsonArray
-LOOTWorker::createPlugins(loot::GameInterface& game,
-                          const std::vector<std::string>& sortedPlugins) const
+json LOOTWorker::createPlugins(loot::GameInterface& game,
+                               const std::vector<std::string>& sortedPlugins) const
 {
-  QJsonArray plugins;
+  json plugins = json::array();
 
   for (auto&& pluginName : sortedPlugins) {
 
     auto plugin = game.GetPlugin(pluginName);
 
-    QJsonObject o;
-    o["name"] = QString::fromStdString(pluginName);
+    json o    = json::object();
+    o["name"] = pluginName;
 
     if (auto metaData = game.GetDatabase().GetPluginMetadata(pluginName, true, true)) {
-      set(o, "incompatibilities",
-          createIncompatibilities(game, metaData->GetIncompatibilities()));
-      set(o, "messages", createMessages(metaData->GetMessages()));
-      set(o, "dirty", createDirty(metaData->GetDirtyInfo()));
-      set(o, "clean", createClean(metaData->GetCleanInfo()));
+      o["incompatibilities"] =
+          createIncompatibilities(game, metaData->GetIncompatibilities());
+      o["messages"] = createMessages(metaData->GetMessages());
+      o["dirty"]    = createDirty(metaData->GetDirtyInfo());
+      o["clean"]    = createClean(metaData->GetCleanInfo());
     }
 
-    set(o, "missingMasters", createMissingMasters(game, pluginName));
+    o["missingMasters"] = createMissingMasters(game, pluginName);
 
     if (plugin->LoadsArchive()) {
       o["loadsArchive"] = true;
@@ -919,42 +916,40 @@ LOOTWorker::createPlugins(loot::GameInterface& game,
   return plugins;
 }
 
-QJsonValue LOOTWorker::createMessages(const std::vector<loot::Message>& list) const
+json LOOTWorker::createMessages(const std::vector<loot::Message>& list) const
 {
-  QJsonArray messages;
+  auto messages = json::array();
 
   for (loot::Message m : list) {
     auto simpleMessage = loot::SelectMessageContent(m.GetContent(), m_Language);
     if (simpleMessage.has_value()) {
-      messages.push_back(QJsonObject{
-          {"type", QString::fromStdString(toString(m.GetType()))},
-          {"text", QString::fromStdString(simpleMessage.value().GetText())}});
+      messages.push_back(
+          {{"type", toString(m.GetType())}, {"text", simpleMessage.value().GetText()}});
     }
   }
 
   return messages;
 }
 
-QJsonValue
-LOOTWorker::createDirty(const std::vector<loot::PluginCleaningData>& data) const
+json LOOTWorker::createDirty(const std::vector<loot::PluginCleaningData>& data) const
 {
-  QJsonArray array;
+  auto array = json::array();
 
   for (const auto& d : data) {
-    QJsonObject o{
-        {"crc", static_cast<qint64>(d.GetCRC())},
-        {"itm", static_cast<qint64>(d.GetITMCount())},
-        {"deletedReferences", static_cast<qint64>(d.GetDeletedReferenceCount())},
-        {"deletedNavmesh", static_cast<qint64>(d.GetDeletedNavmeshCount())},
+    json o{
+        {"crc", static_cast<int64_t>(d.GetCRC())},
+        {"itm", static_cast<int64_t>(d.GetITMCount())},
+        {"deletedReferences", static_cast<int64_t>(d.GetDeletedReferenceCount())},
+        {"deletedNavmesh", static_cast<int64_t>(d.GetDeletedNavmeshCount())},
     };
 
-    set(o, "cleaningUtility", QString::fromStdString(d.GetCleaningUtility()));
-    auto simpleMessage = loot::SelectMessageContent(
+    o["cleaningUtility"] = d.GetCleaningUtility();
+    auto simpleMessage   = loot::SelectMessageContent(
         loot::Message(loot::MessageType::say, d.GetDetail()).GetContent(), m_Language);
     if (simpleMessage.has_value()) {
-      set(o, "info", QString::fromStdString(simpleMessage.value().GetText()));
+      o["info"] = simpleMessage.value().GetText();
     } else {
-      set(o, "info", QString::fromStdString(""));
+      o["info"] = "";
     }
 
     array.push_back(o);
@@ -963,23 +958,22 @@ LOOTWorker::createDirty(const std::vector<loot::PluginCleaningData>& data) const
   return array;
 }
 
-QJsonValue
-LOOTWorker::createClean(const std::vector<loot::PluginCleaningData>& data) const
+json LOOTWorker::createClean(const std::vector<loot::PluginCleaningData>& data) const
 {
-  QJsonArray array;
+  auto array = json::array();
 
   for (const auto& d : data) {
-    QJsonObject o{
-        {"crc", static_cast<qint64>(d.GetCRC())},
+    json o{
+        {"crc", static_cast<int64_t>(d.GetCRC())},
     };
 
-    set(o, "cleaningUtility", QString::fromStdString(d.GetCleaningUtility()));
-    auto simpleMessage = loot::SelectMessageContent(
+    o["cleaningUtility"] = d.GetCleaningUtility();
+    auto simpleMessage   = loot::SelectMessageContent(
         loot::Message(loot::MessageType::say, d.GetDetail()).GetContent(), m_Language);
     if (simpleMessage.has_value()) {
-      set(o, "info", QString::fromStdString(simpleMessage.value().GetText()));
+      o["info"] = simpleMessage.value().GetText();
     } else {
-      set(o, "info", QString::fromStdString(""));
+      o["info"] = "";
     }
 
     array.push_back(o);
@@ -988,25 +982,23 @@ LOOTWorker::createClean(const std::vector<loot::PluginCleaningData>& data) const
   return array;
 }
 
-QJsonValue
-LOOTWorker::createIncompatibilities(loot::GameInterface& game,
-                                    const std::vector<loot::File>& data) const
+json LOOTWorker::createIncompatibilities(loot::GameInterface& game,
+                                         const std::vector<loot::File>& data) const
 {
-  QJsonArray array;
+  auto array = json::array();
 
   for (auto&& f : data) {
-    const auto n = static_cast<std::string>(f.GetName());
-    if (!game.GetPlugin(n)) {
+    const auto name = static_cast<std::string>(f.GetName());
+    if (!game.GetPlugin(name)) {
       continue;
     }
 
-    const auto name        = QString::fromStdString(n);
-    const auto displayName = QString::fromStdString(f.GetDisplayName());
+    const auto displayName = f.GetDisplayName();
 
-    QJsonObject o{{"name", name}};
+    json o{{"name", name}};
 
     if (displayName != name) {
-      set(o, "displayName", displayName);
+      o["displayName"] = displayName;
     }
 
     array.push_back(std::move(o));
@@ -1015,14 +1007,14 @@ LOOTWorker::createIncompatibilities(loot::GameInterface& game,
   return array;
 }
 
-QJsonValue LOOTWorker::createMissingMasters(loot::GameInterface& game,
-                                            const std::string& pluginName) const
+json LOOTWorker::createMissingMasters(loot::GameInterface& game,
+                                      const std::string& pluginName) const
 {
-  QJsonArray array;
+  auto array = json::array();
 
   for (auto&& master : game.GetPlugin(pluginName)->GetMasters()) {
     if (!game.GetPlugin(master)) {
-      array.push_back(QString::fromStdString(master));
+      array.push_back(master);
     }
   }
 

@@ -1,0 +1,14 @@
+{
+  "dependencies": [
+    "boost-locale",
+    "tomlplusplus",
+    "libloot",
+    "nlohmann-json"
+  ],
+  "overrides": [
+    {
+      "name": "tomlplusplus",
+      "version": "3.1.0"
+    }
+  ]
+}

@@ -48,11 +48,22 @@ if (MSVC)
 	set_target_properties(lootcli PROPERTIES VS_STARTUP_PROJECT lootcli)
 endif()
 
-# add_library(lootcli-utils )
-
-# add_library(mo2::lootcli ALIAS lootcli)
-
 install(FILES
 	$<TARGET_FILE:lootcli>
 	$<TARGET_FILE:libloot::loot>
 DESTINATION bin/loot)
+
+# library to make the header available
+add_library(lootcli-header INTERFACE)
+target_sources(lootcli-header INTERFACE
+	FILE_SET HEADERS
+	BASE_DIRS ${CMAKE_CURRENT_LIST_DIR}/../include
+	FILES ${CMAKE_CURRENT_LIST_DIR}/../include/lootcli/lootcli.h)
+add_library(mo2::lootcli-header ALIAS lootcli-header)
+
+install(TARGETS lootcli-header EXPORT lootcliHeaderTargets FILE_SET HEADERS)
+install(EXPORT lootcliHeaderTargets
+	FILE mo2-lootcli-header-targets.cmake
+	NAMESPACE mo2::
+	DESTINATION lib/cmake/mo2-lootcli-header
+)

@@ -1,9 +1,17 @@
 cmake_minimum_required(VERSION 3.16)
 
+# Qt is not required, this allows us to skip building the executable and only create
+# the single-header interface when using this as a VCPKG dependency
+
+find_package(Qt6 CONFIG COMPONENTS Core)
+
+if (Qt6_FOUND)
+
+message(STATUS "Qt6 found, building lootcli executable")
+
 find_package(tomlplusplus CONFIG REQUIRED)
 find_package(libloot CONFIG REQUIRED)
 find_package(Boost REQUIRED CONFIG COMPONENTS locale)
-find_package(nlohmann_json CONFIG REQUIRED)
 
 # avoid CMake error/warning
 set_target_properties(libloot::loot PROPERTIES
@@ -32,7 +40,7 @@ target_include_directories(lootcli PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../includ
 target_precompile_headers(lootcli PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/pch.h)
 target_link_libraries(lootcli
     PRIVATE libloot::loot Boost::headers Boost::locale
-	tomlplusplus::tomlplusplus nlohmann_json::nlohmann_json)
+	tomlplusplus::tomlplusplus Qt6::Core)
 
 if (MSVC)
 	target_compile_options(lootcli
@@ -54,6 +62,8 @@ install(FILES
 	$<TARGET_FILE:lootcli>
 	$<TARGET_FILE:libloot::loot>
 DESTINATION bin/loot)
+
+endif()
 
 # library to make the header available
 add_library(lootcli-header INTERFACE)

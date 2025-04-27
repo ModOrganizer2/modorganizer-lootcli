@@ -11,10 +11,47 @@ static constexpr float FONV_MINIMUM_HEADER_VERSION       = 1.32f;
 static constexpr float FO4_MINIMUM_HEADER_VERSION        = 0.95f;
 static constexpr float STARFIELD_MINIMUM_HEADER_VERSION  = 0.96f;
 
+std::filesystem::path GetOpenMWDataPath(const std::filesystem::path& gamePath)
+{
+#ifndef _WIN32
+  if (gamePath == "/usr/games") {
+    // Ubuntu, Debian
+    return "/usr/share/games/openmw/resources/vfs";
+  } else if (gamePath == "/run/host/usr/games") {
+    // Ubuntu, Debian from inside a Flatpak sandbox
+    return "/run/host/usr/share/games/openmw/resources/vfs";
+  } else if (gamePath == "/usr/bin") {
+    const auto path = "/usr/share/games/openmw/resources/vfs";
+    if (std::filesystem::exists(path)) {
+      // Arch
+      return path;
+    }
+
+    // OpenSUSE
+    return "/usr/share/openmw/resources/vfs";
+  } else if (gamePath == "/run/host/usr/bin") {
+    const auto path = "/run/host/usr/share/games/openmw/resources/vfs";
+    if (std::filesystem::exists(path)) {
+      // Arch from inside a Flatpak sandbox
+      return path;
+    }
+
+    // OpenSUSE from inside a Flatpak sandbox
+    return "/run/host/usr/share/openmw/resources/vfs";
+  } else if (boost::ends_with(gamePath.u8string(),
+                              "/app/org.openmw.OpenMW/current/active/files/bin")) {
+    // Flatpak
+    return gamePath / "../share/games/openmw/resources/vfs";
+  }
+#endif
+  return gamePath / "resources" / "vfs";
+}
+
 GameType GetGameType(const GameId gameId)
 {
   switch (gameId) {
   case GameId::tes3:
+  case GameId::openmw:
     return GameType::tes3;
   case GameId::tes4:
   case GameId::nehrim:
@@ -46,6 +83,7 @@ float GetMinimumHeaderVersion(const GameId gameId)
 {
   switch (gameId) {
   case GameId::tes3:
+  case GameId::openmw:
     return MORROWIND_MINIMUM_HEADER_VERSION;
   case GameId::tes4:
   case GameId::nehrim:
@@ -71,11 +109,12 @@ float GetMinimumHeaderVersion(const GameId gameId)
   }
 }
 
-std::string GetPluginsFolderName(GameId gameId)
+std::filesystem::path GetDataPath(const GameId gameId,
+    const std::filesystem::path& gamePath)
 {
   switch (gameId) {
   case GameId::tes3:
-    return "Data Files";
+    return gamePath / "Data Files";
   case GameId::tes4:
   case GameId::nehrim:
   case GameId::tes5:
@@ -88,7 +127,9 @@ std::string GetPluginsFolderName(GameId gameId)
   case GameId::fo4:
   case GameId::fo4vr:
   case GameId::starfield:
-    return "Data";
+    return gamePath / "Data";
+  case GameId::openmw:
+    return GetOpenMWDataPath(gamePath);
   default:
     throw std::logic_error("Unrecognised game ID");
   }
@@ -123,6 +164,8 @@ std::string ToString(const GameId gameId)
     return "Fallout4VR";
   case GameId::starfield:
     return "Starfield";
+  case GameId::openmw:
+    return "OpenMW";
   default:
     throw std::logic_error("Unrecognised game ID");
   }
@@ -158,6 +201,12 @@ std::string GetMasterFilename(const GameId gameId)
     return "Fallout4.esm";
   case GameId::starfield:
     return "Starfield.esm";
+  case GameId::openmw:
+    // This isn't actually a master file, but it's hardcoded to load first,
+    // and the value is only used to check the game is installed and to
+    // skip fully loading this file before sorting - and omwscripts files
+    // don't get loaded anyway.
+    return "builtin.omwscripts";
   default:
     throw std::logic_error("Unrecognised game ID");
   }
@@ -192,6 +241,8 @@ std::string GetGameName(const GameId gameId)
     return "Fallout 4 VR";
   case GameId::starfield:
     return "Starfield";
+  case GameId::openmw:
+    return "OpenMW";
   default:
     throw std::logic_error("Unrecognised game ID");
   }
@@ -301,7 +352,7 @@ std::filesystem::path GameSettings::GameLocalPath() const
 
 std::filesystem::path GameSettings::DataPath() const
 {
-  return gamePath_ / GetPluginsFolderName(id_);
+  return GetDataPath(id_, gamePath_);
 }
 
 GameSettings& GameSettings::SetName(const std::string& name)

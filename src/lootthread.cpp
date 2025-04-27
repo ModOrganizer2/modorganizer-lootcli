@@ -667,7 +667,7 @@ int LOOTWorker::run()
     std::locale::global(gen("en.UTF-8"));
   }
 
-  loot::SetLoggingCallback([&](loot::LogLevel level, const char* message) {
+  loot::SetLoggingCallback([&](loot::LogLevel level, std::string_view message) {
     log(level, message);
   });
 
@@ -785,20 +785,22 @@ int LOOTWorker::run()
     progress(Progress::LoadingLists);
 
     fs::path userlist = userlistPath();
-    gameHandle->GetDatabase().LoadLists(masterlistPath().string(),
-                                        fs::exists(userlist) ? userlistPath().string()
+    gameHandle->GetDatabase().LoadMasterlist(masterlistPath().string());
+    gameHandle->GetDatabase().LoadUserlist(fs::exists(userlist) ? userlistPath().string()
                                                              : fs::path());
 
     progress(Progress::ReadingPlugins);
     gameHandle->LoadCurrentLoadOrderState();
+    auto loadOrder = gameHandle->GetLoadOrder();
     std::vector<std::filesystem::path> pluginsList;
     for (auto plugin : gameHandle->GetLoadOrder()) {
       std::filesystem::path pluginPath(plugin);
       pluginsList.push_back(pluginPath);
     }
+    gameHandle->LoadPlugins(pluginsList, false);
 
     progress(Progress::SortingPlugins);
-    std::vector<std::string> sortedPlugins = gameHandle->SortPlugins(pluginsList);
+    std::vector<std::string> sortedPlugins = gameHandle->SortPlugins(loadOrder);
 
     progress(Progress::WritingLoadorder);
 
@@ -1040,14 +1042,7 @@ void LOOTWorker::progress(Progress p)
   std::cout.flush();
 }
 
-std::string escapeNewlines(const std::string& s)
-{
-  auto ss = boost::replace_all_copy(s, "\n", "\\n");
-  boost::replace_all(ss, "\r", "\\r");
-  return ss;
-}
-
-void LOOTWorker::log(loot::LogLevel level, const std::string& message) const
+void LOOTWorker::log(loot::LogLevel level, const std::string_view message) const
 {
   if (level < m_LogLevel) {
     return;
@@ -1056,7 +1051,7 @@ void LOOTWorker::log(loot::LogLevel level, const std::string& message) const
   const auto ll        = fromLootLogLevel(level);
   const auto levelName = logLevelToString(ll);
 
-  std::cout << "[" << levelName << "] " << escapeNewlines(message) << "\n";
+  std::cout << "[" << levelName << "] " << message << "\n";
   std::cout.flush();
 }
 

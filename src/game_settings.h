@@ -30,14 +30,16 @@ enum struct GameId : uint8_t
   fonv,
   fo4,
   fo4vr,
-  starfield
+  starfield,
+  openmw
 };
 
 GameType GetGameType(const GameId gameId);
 
 float GetMinimumHeaderVersion(const GameId gameId);
 
-std::string GetPluginsFolderName(GameId gamiId);
+std::filesystem::path GetDataPath(const GameId gamiId,
+                                  const std::filesystem::path& gamePath);
 
 std::string ToString(const GameId gameId);
 

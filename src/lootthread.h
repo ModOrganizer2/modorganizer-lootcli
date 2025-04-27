@@ -2,6 +2,7 @@
 #define LOOTTHREAD_H
 
 #include "game_settings.h"
+#include "loot/database_interface.h"
 #include <lootcli/lootcli.h>
 
 namespace loot
@@ -35,7 +36,7 @@ public:
 
 private:
   void progress(Progress p);
-  void log(loot::LogLevel level, const std::string& message) const;
+  void log(loot::LogLevel level, const std::string_view message) const;
 
   DWORD GetFile(const WCHAR* szUrl, const CHAR* szFileName);
   void getSettings(const std::filesystem::path& file);

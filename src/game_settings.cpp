@@ -74,6 +74,8 @@ GameType GetGameType(const GameId gameId)
     return GameType::fo4vr;
   case GameId::starfield:
     return GameType::starfield;
+  case GameId::oblivionRemastered:
+    return GameType::oblivionRemastered;
   default:
     throw std::logic_error("Unrecognised game ID");
   }
@@ -87,6 +89,7 @@ float GetMinimumHeaderVersion(const GameId gameId)
     return MORROWIND_MINIMUM_HEADER_VERSION;
   case GameId::tes4:
   case GameId::nehrim:
+  case GameId::oblivionRemastered:
     return OBLIVION_MINIMUM_HEADER_VERSION;
   case GameId::tes5:
   case GameId::enderal:
@@ -130,6 +133,8 @@ std::filesystem::path GetDataPath(const GameId gameId,
     return gamePath / "Data";
   case GameId::openmw:
     return GetOpenMWDataPath(gamePath);
+  case GameId::oblivionRemastered:
+    return gamePath / "OblivionRemastered" / "Content" / "Dev" / "ObvData" / "Data";
   default:
     throw std::logic_error("Unrecognised game ID");
   }
@@ -166,6 +171,8 @@ std::string ToString(const GameId gameId)
     return "Starfield";
   case GameId::openmw:
     return "OpenMW";
+  case GameId::oblivionRemastered:
+    return "Oblivion Remastered";
   default:
     throw std::logic_error("Unrecognised game ID");
   }
@@ -183,6 +190,7 @@ std::string GetMasterFilename(const GameId gameId)
   case GameId::tes3:
     return "Morrowind.esm";
   case GameId::tes4:
+  case GameId::oblivionRemastered:
     return "Oblivion.esm";
   case GameId::nehrim:
     return "Nehrim.esm";
@@ -243,6 +251,8 @@ std::string GetGameName(const GameId gameId)
     return "Starfield";
   case GameId::openmw:
     return "OpenMW";
+  case GameId::oblivionRemastered:
+    return "TES IV: Oblivion Remastered";
   default:
     throw std::logic_error("Unrecognised game ID");
   }
@@ -255,6 +265,7 @@ std::string GetDefaultMasterlistRepositoryName(const GameId gameId)
     return "morrowind";
   case GameId::tes4:
   case GameId::nehrim:
+  case GameId::oblivionRemastered:
     return "oblivion";
   case GameId::tes5:
     return "skyrim";

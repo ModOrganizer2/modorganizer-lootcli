@@ -113,7 +113,7 @@ float GetMinimumHeaderVersion(const GameId gameId)
 }
 
 std::filesystem::path GetDataPath(const GameId gameId,
-    const std::filesystem::path& gamePath)
+                                  const std::filesystem::path& gamePath)
 {
   switch (gameId) {
   case GameId::tes3:

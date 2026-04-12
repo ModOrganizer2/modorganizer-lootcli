@@ -14,7 +14,7 @@ find_package(libloot CONFIG REQUIRED)
 find_package(Boost REQUIRED CONFIG COMPONENTS locale)
 
 # avoid CMake error/warning
-set_target_properties(libloot::loot PROPERTIES
+set_target_properties(libloot::libloot PROPERTIES
   MAP_IMPORTED_CONFIG_RELEASE RelWithDebInfo
   MAP_IMPORTED_CONFIG_MINSIZEREL RelWithDebInfo
 )
@@ -42,7 +42,7 @@ target_compile_definitions(lootcli
 target_include_directories(lootcli PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../include)
 target_precompile_headers(lootcli PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/pch.h)
 target_link_libraries(lootcli
-    PRIVATE libloot::loot Boost::headers Boost::locale
+    PRIVATE libloot::libloot Boost::headers Boost::locale
 	tomlplusplus::tomlplusplus Qt6::Core)
 
 if (MSVC)
@@ -64,7 +64,7 @@ endif()
 
 install(FILES
 	$<TARGET_FILE:lootcli>
-	$<TARGET_FILE:libloot::loot>
+	$<TARGET_FILE:libloot::libloot>
 DESTINATION bin/loot)
 
 endif()

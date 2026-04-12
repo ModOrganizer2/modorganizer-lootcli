@@ -19,7 +19,7 @@ namespace lootcli
 {
 static const std::set<std::string>
     oldDefaultBranches({"master", "v0.7", "v0.8", "v0.10", "v0.13", "v0.14", "v0.15",
-                        "v0.17", "v0.18", "v0.21"});
+                        "v0.17", "v0.18", "v0.21", "v0.26"});
 static const std::regex GITHUB_REPO_URL_REGEX =
     std::regex(R"(^https://github\.com/([^/]+)/([^/]+?)(?:\.git)?/?$)",
                std::regex::ECMAScript | std::regex::icase);
@@ -867,7 +867,7 @@ LOOTWorker::createJsonReport(loot::GameInterface& game,
 {
   QJsonObject root;
 
-  set(root, "messages", createMessages(game.GetDatabase().GetGeneralMessages(true)));
+  set(root, "messages", createMessages(game.GetDatabase().GetGeneralMessages(true, true)));
   set(root, "plugins", createPlugins(game, sortedPlugins));
 
   const auto end = std::chrono::high_resolution_clock::now();

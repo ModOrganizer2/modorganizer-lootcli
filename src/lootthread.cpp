@@ -867,7 +867,8 @@ LOOTWorker::createJsonReport(loot::GameInterface& game,
 {
   QJsonObject root;
 
-  set(root, "messages", createMessages(game.GetDatabase().GetGeneralMessages(true, true)));
+  set(root, "messages",
+      createMessages(game.GetDatabase().GetGeneralMessages(true, true)));
   set(root, "plugins", createPlugins(game, sortedPlugins));
 
   const auto end = std::chrono::high_resolution_clock::now();

@@ -21,7 +21,7 @@
       },
       {
         "kind": "git",
-        "repository": "https://github.com/Silarn/vcpkg-registry",
+        "repository": "https://github.com/ModOrganizer2/vcpkg-registry",
         "baseline": "e65087f8c544bd3bb5b4a72967b8956ce197b718",
         "packages": ["libloot"]
       }

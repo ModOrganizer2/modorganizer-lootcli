@@ -74,8 +74,12 @@ int wWinMain(HINSTANCE, HINSTANCE, LPTSTR, int)
     worker.setUpdateMasterlist(!getParameter<bool>(arguments, "skipUpdateMasterlist"));
     worker.setGame(getParameter<std::string>(arguments, "game"));
     worker.setGamePath(getParameter<std::string>(arguments, "gamePath"));
-    worker.setPluginListPath(getParameter<std::string>(arguments, "pluginListPath"));
-    worker.setOutput(getParameter<std::string>(arguments, "out"));
+
+    const auto pluginListPath = getParameter<std::string>(arguments, "pluginListPath");
+    worker.setPluginListPath(pluginListPath);
+    worker.setReportOutputPath(getParameter<std::string>(arguments, "out"));
+    worker.setSortedPluginListOutputPath(getOptionalParameter<std::string>(
+        arguments, "pluginListOutputPath", pluginListPath));
     worker.setLogLevel(getLogLevel(arguments));
 
     const auto lang = getOptionalParameter<std::string>(arguments, "language", "");

@@ -23,8 +23,9 @@ public:
 
   void setGame(const std::string& gameName);
   void setGamePath(const std::string& gamePath);
-  void setOutput(const std::string& outputPath);
+  void setReportOutputPath(const std::string& reportOutputPath);
   void setPluginListPath(const std::string& pluginListPath);
+  void setSortedPluginListOutputPath(const std::string& sortedPluginListOutputPath);
   void
   setLanguageCode(const std::string& language_code);  // Will add this when I figure out
                                                       // how languages work on MO
@@ -73,8 +74,9 @@ private:
   std::string m_Language;
   std::string m_GameName;
   std::string m_GamePath;
-  std::string m_OutputPath;
+  std::string m_ReportOutputPath;
   std::string m_PluginListPath;
+  std::string m_SortedPluginListOutputPath;
   loot::LogLevel m_LogLevel;
   bool m_UpdateMasterlist;
   mutable std::recursive_mutex mutex_;
